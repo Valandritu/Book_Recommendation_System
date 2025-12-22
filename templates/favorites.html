@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>My Favorites</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="header">
+        <h1><i class="fas fa-star"></i> My Favorite Books</h1>
+        <div class="header-right">
+            <button onclick="window.history.back()" class="nav-btn"><i class="fas fa-arrow-left"></i> Back</button>
+            <a href="/" class="nav-btn"><i class="fas fa-home"></i> Home</a>
+            <a href="/history" class="nav-btn"><i class="fas fa-clock"></i> History</a>
+            <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    {% if favorites %}
+    <div class="book-container">
+
+        {% for fav in favorites %}
+        <div class="book-card">
+
+            {% if fav[5] %}
+            <img src="{{ fav[5] }}" alt="Book Cover">
+            {% endif %}
+
+            <h3>{{ fav[3] }}</h3>
+            <p><strong>Author:</strong> {{ fav[4] }}</p>
+
+            <!-- Buttons -->
+            <div class="btn-group">
+
+                <a href="{{ url_for('book_details', book_id=fav[2]) }}" class="btn">
+                    <i class="fas fa-info-circle"></i> Details
+                </a>
+
+                <a href="https://www.google.com/search?q={{ fav[3] }} book" target="_blank" class="btn">
+                    <i class="fas fa-search"></i> Search Online
+                </a>
+
+                <a href="{{ url_for('delete_favorite', fav_id=fav[0]) }}" class="btn btn-danger" onclick="return confirm('Delete this favorite?')">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+        <p class="message">No favorite books yet.</p>
+    {% endif %}
+
+</body>
+</html>

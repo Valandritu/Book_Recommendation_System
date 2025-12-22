@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Search History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background: #000 !important;
+        }
+        .history-container {
+            background: #333;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px auto;
+            max-width: 900px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #fff;
+        }
+        .history-table thead {
+            background: #2a2a2a;
+        }
+        .history-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #0078d4;
+            color: #fff;
+        }
+        .history-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #444;
+            color: #fff;
+        }
+        .history-table tbody tr:hover {
+            background: #444;
+        }
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            color: #999;
+        }
+        .empty-state i {
+            font-size: 48px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1><i class="fas fa-clock"></i> Search History</h1>
+        <div class="header-right">
+            <button onclick="window.history.back()" class="nav-btn"><i class="fas fa-arrow-left"></i> Back</button>
+            <a href="/" class="nav-btn"><i class="fas fa-home"></i> Home</a>
+            <a href="/favorites" class="nav-btn"><i class="fas fa-star"></i> Favorites</a>
+            <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    {% if history %}
+    <div class="history-container">
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-search"></i> Search Query</th>
+                    <th><i class="fas fa-calendar-alt"></i> Date & Time</th>
+                    <th style="width: 120px; text-align: center;"><i class="fas fa-cog"></i> Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in history %}
+                <tr>
+                    <td>
+                        <strong>{{ row[1] }}</strong>
+                    </td>
+                    <td>
+                        <small>{{ row[2] }}</small>
+                    </td>
+                    <td style="text-align: center;">
+                        <form method="POST" action="/delete_history/{{ row[0] }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this history entry?');">
+                            <button type="submit" class="delete-btn">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="history-container">
+            <div class="empty-state">
+                <i class="fas fa-history"></i>
+                <p><strong>No search history available</strong></p>
+                <p style="font-size: 14px; color: #666;">Your search queries will appear here</p>
+            </div>
+        </div>
+    {% endif %}
+
+</body>
+</html>

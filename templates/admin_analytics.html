@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Analytics</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background-color: #111119;
+            color: white;
+            font-family: 'Arial', sans-serif;
+        }
+        h2, h4 {
+            font-weight: 600;
+        }
+
+        .admin-card {
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+            text-align: center;
+        }
+        .admin-card:hover {
+            transform: translateY(-5px);
+        }
+
+        canvas {
+            background: #fff;
+            border-radius: 1rem;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        table {
+            background-color: #1b1b27;
+            color: #fff;
+        }
+        th {
+            color: #ffda79;
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+        <button onclick="window.history.back()" class="btn btn-outline-light me-3"><i class="fas fa-arrow-left"></i> Back</button>
+        <a class="navbar-brand fw-bold" href="{{ url_for('admin_dashboard') }}">Admin Panel</a>
+        <div class="ms-auto">
+
+            <a class="btn btn-outline-light" href="{{ url_for('admin_logout') }}">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5">
+
+    <h2 class="mb-4">Advanced Analytics Dashboard</h2>
+
+    <!-- STAT CARDS -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4 col-sm-6">
+            <div class="card admin-card text-white bg-primary p-4">
+                <h5>Total Users</h5>
+                <p class="fs-3">{{ total_users }}</p>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card admin-card text-white bg-success p-4">
+                <h5>Total Books</h5>
+                <p class="fs-3">{{ total_books }}</p>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card admin-card text-white bg-warning p-4">
+                <h5>Total Reviews</h5>
+                <p class="fs-3">{{ total_reviews }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== CHARTS SECTION ======== -->
+    <div class="row g-4">
+
+        <!-- PIE CHART -->
+        <div class="col-md-4">
+            <h4 class="text-center mb-2">Overall Distribution</h4>
+            <canvas id="pieChart"></canvas>
+        </div>
+
+        <!-- BAR CHART -->
+        <div class="col-md-4">
+            <h4 class="text-center mb-2">Users vs Books</h4>
+            <canvas id="barChart"></canvas>
+        </div>
+
+        <!-- LINE CHART -->
+        <div class="col-md-4">
+            <h4 class="text-center mb-2">Reviews Per Day</h4>
+            <canvas id="lineChart"></canvas>
+        </div>
+    </div>
+
+    <!-- TABLES SECTION -->
+    <div class="row mt-5 g-4">
+
+        <!-- Top Reviewed Books -->
+        <div class="col-md-6">
+            <h4>Top 5 Most Reviewed Books</h4>
+            <table class="table table-striped table-dark">
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        <th>Reviews</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book, count in top_books %}
+                    <tr>
+                        <td>{{ book }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Recent Users -->
+        <div class="col-md-6">
+            <h4>Recent 5 Registered Users</h4>
+            <table class="table table-striped table-dark">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Joined On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user, date in recent_users %}
+                    <tr>
+                        <td>{{ user }}</td>
+                        <td>{{ date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- ======== CHART SCRIPTS ======== -->
+<script>
+    // PIE CHART
+    new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Users', 'Books', 'Reviews'],
+            datasets: [{
+                data: [{{ total_users }}, {{ total_books }}, {{ total_reviews }}],
+                backgroundColor: ['#007bff', '#28a745', '#ffc107']
+            }]
+        }
+    });
+
+    // BAR CHART
+    new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Users', 'Books'],
+            datasets: [{
+                label: 'Count',
+                data: [{{ total_users }}, {{ total_books }}],
+                backgroundColor: ['#007bff', '#28a745']
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // LINE CHART
+    new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+            labels: {{ review_dates | safe }},
+            datasets: [{
+                label: 'Reviews per Day',
+                data: {{ review_counts | safe }},
+                fill: false,
+                borderColor: '#ffc107',
+                tension: 0.2
+            }]
+        }
+    });
+</script>
+
+</body>
+</html>

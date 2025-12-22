@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Book Recommendation System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <h1><i class="fas fa-book-open"></i> Book Recommendation System</h1>
+
+        <div class="header-right">
+            <a href="/favorites" class="nav-btn"><i class="fas fa-star"></i> Favorites</a>
+            <a href="/history" class="nav-btn"><i class="fas fa-clock"></i> History</a>
+            <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+
+    <!-- Search Box -->
+    <div class="search-box">
+        <form method="POST" action="{{ url_for('recommend') }}">
+            <input type="text" name="query" placeholder="Search a book..."
+                   required value="{{ search if search }}">
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
+
+
+    <!-- Show Message -->
+    {% if message %}
+        <p class="message">{{ message }}</p>
+    {% endif %}
+
+
+
+    <!-- ========================= -->
+    <!-- ⭐ SUGGESTIONS SECTION -->
+    <!-- ========================= -->
+    {% if suggestions %}
+    <h2 class="section-title"><i class="fas fa-fire" style="margin-right: 12px;"></i> Popular Book Suggestions</h2>
+
+    <div class="book-container">
+        {% for book in suggestions %}
+        <div class="book-card">
+
+            {% if book.image %}
+            <img src="{{ book.image }}" alt="Book Cover">
+            {% endif %}
+
+            <h3>{{ book.title }}</h3>
+            <p><strong>Author:</strong> {{ book.author }}</p>
+
+            <!-- Buttons -->
+            <div class="link-group">
+
+                <a href="{{ url_for('book_details', book_id=book.id) }}" class="book-link">
+                    <i class="fas fa-info-circle"></i> Details
+                </a>
+
+                <a href="{{ url_for('add_favorite',
+                                    book_id=book.id,
+                                    title=book.title,
+                                    author=book.author,
+                                    image=book.image ) }}"
+                   class="book-link">
+                    <i class="fas fa-star"></i> Favorite
+                </a>
+
+                <a href="{{ book.link }}" target="_blank" class="book-link">
+                    <i class="fas fa-external-link-alt"></i> Preview
+                </a>
+
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ========================= -->
+    <!-- 🔍 SEARCH RESULTS SECTION -->
+    <!-- ========================= -->
+    {% if books %}
+    <h2 class="section-title"><i class="fas fa-search"></i> Search Results</h2>
+
+    <div class="book-container">
+
+        {% for book in books %}
+        <div class="book-card">
+
+            {% if book.image %}
+            <img src="{{ book.image }}" alt="Book Cover">
+            {% endif %}
+
+            <h3>{{ book.title }}</h3>
+            <p><strong>Author:</strong> {{ book.author }}</p>
+
+            <!-- Buttons -->
+            <div class="link-group">
+                <a href="{{ url_for('book_details', book_id=book.id) }}" class="book-link">
+                    <i class="fas fa-info-circle"></i> Details
+                </a>
+
+                <a href="{{ url_for('add_favorite',
+                                    book_id=book.id,
+                                    title=book.title,
+                                    author=book.author,
+                                    image=book.image ) }}"
+                   class="book-link">
+                    <i class="fas fa-star"></i> Favorite
+                </a>
+
+                <a href="{{ book.link }}" target="_blank" class="book-link">
+                    <i class="fas fa-external-link-alt"></i> Preview
+                </a>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+
+    <!-- ========================= -->
+    <!-- 📄 PAGINATION -->
+    <!-- ========================= -->
+    {% if total_pages and total_pages > 1 %}
+    <div class="pagination">
+
+        {% if page > 1 %}
+        <a href="?page={{ page - 1 }}" class="page-btn">
+            <i class="fas fa-chevron-left"></i> Prev
+        </a>
+        {% endif %}
+
+        <span class="page-number">Page {{ page }} of {{ total_pages }}</span>
+
+        {% if page < total_pages %}
+        <a href="?page={{ page + 1 }}" class="page-btn">
+            Next <i class="fas fa-chevron-right"></i>
+        </a>
+        {% endif %}
+
+    </div>
+    {% endif %}
+
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Book Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .review-section {
+            margin-top: 40px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            color: white;
+        }
+        .review-section h3,
+        .review-section h4 {
+            color: white;
+        }
+        .review-form {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            color: white;
+        }
+        .review-form label {
+            color: white;
+        }
+        .review-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-family: Arial, sans-serif;
+            margin-bottom: 10px;
+            background: #333;
+            color: white;
+        }
+        .review-form select {
+            padding: 8px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            background: #333;
+            color: white;
+        }
+        .review-item {
+            background: #2a2a2a;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+            color: white;
+        }
+        .review-item .reviewer-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .review-item .review-rating {
+            color: #ff9800;
+            font-weight: bold;
+        }
+        .review-item .review-text {
+            margin-top: 10px;
+            color: #666;
+        }
+        .btn-submit {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-submit:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1><i class="fas fa-info-circle"></i> Book Details</h1>
+        <div class="header-right">
+            <button onclick="window.history.back()" class="nav-btn"><i class="fas fa-arrow-left"></i> Back</button>
+            <a href="/" class="nav-btn"><i class="fas fa-home"></i> Home</a>
+            <a href="/favorites" class="nav-btn"><i class="fas fa-star"></i> Favorites</a>
+            <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <div class="details-container">
+
+        <div class="details-left">
+            {% if book.image %}
+            <img src="{{ book.image }}" alt="Book Cover" class="details-image">
+            {% endif %}
+        </div>
+
+        <div class="details-right">
+            <h2>{{ book.title }}</h2>
+            <p><strong>Author:</strong> {{ book.author }}</p>
+            <p><strong>Publisher:</strong> {{ book.publisher }}</p>
+            <p><strong>Published Date:</strong> {{ book.publishedDate }}</p>
+            <p><strong>Page Count:</strong> {{ book.pageCount }}</p>
+            <p><strong>Categories:</strong> {{ book.categories }}</p>
+
+            <h3>Description</h3>
+            <p class="description">{{ book.description | safe }}</p>
+
+            <!-- Buttons -->
+            <div class="btn-group">
+
+                <!-- Add to favorites -->
+                <a href="{{ url_for('add_favorite', 
+                                    book_id=book.id, 
+                                    title=book.title, 
+                                    author=book.author, 
+                                    image=book.image) }}"
+                   class="btn">
+                    <i class="fas fa-star"></i> Add to Favorites
+                </a>
+
+                <!-- Preview -->
+                <a href="{{ book.preview }}" class="btn" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> Preview
+                </a>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- REVIEWS SECTION -->
+    <div class="review-section">
+        <h3><i class="fas fa-comments"></i> Reviews</h3>
+
+        <!-- Add Review Form -->
+        <div class="review-form">
+            <h4>Add Your Review</h4>
+            <form method="POST" action="{{ url_for('add_review', book_id=book.id) }}">
+                <div>
+                    <label for="rating"><strong>Rating (1-5 stars):</strong></label>
+                    <select name="rating" id="rating" required>
+                        <option value="">Select Rating</option>
+                        <option value="1">⭐ 1 Star</option>
+                        <option value="2">⭐⭐ 2 Stars</option>
+                        <option value="3">⭐⭐⭐ 3 Stars</option>
+                        <option value="4">⭐⭐⭐⭐ 4 Stars</option>
+                        <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="review"><strong>Your Review:</strong></label>
+                    <textarea name="review" id="review" rows="5" placeholder="Write your review here..." required></textarea>
+                </div>
+                <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> Submit Review</button>
+            </form>
+        </div>
+
+        <!-- Display Reviews -->
+        <h4>User Reviews</h4>
+        {% if reviews and reviews|length > 0 %}
+            {% for review in reviews %}
+            <div class="review-item">
+                <span class="reviewer-name">{{ review[1] }}</span>
+                <span class="review-rating">Rating: {{ review[3] }}/5 ⭐</span>
+                <p class="review-text">{{ review[2] }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No approved reviews yet. Be the first to review this book!</p>
+        {% endif %}
+    </div>
+
+</body>
+</html>
